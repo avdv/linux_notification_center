@@ -31,7 +31,6 @@ import DBus.Client
        ( connectSession, AutoMethod(..), autoMethod, requestName, export
        , nameAllowReplacement, nameReplaceExisting, emit)
 import Data.Char (toLower)
-import qualified Data.Text.IO as TextIO ( putStrLn )
 import Data.Text (unpack, Text, pack )
 import qualified Data.Text as Text
 import Data.Word ( Word, Word8, Word32 )
@@ -41,6 +40,8 @@ import qualified Data.Map as Map
 import Data.Time
 import Data.Time.LocalTime
 import Data.Maybe (fromMaybe)
+
+import Text.Pretty.Simple (pPrint)
 
 import System.Locale.Read
 import System.IO (readFile)
@@ -242,7 +243,7 @@ notify config tState emit
     else
     -- Noti has to be displayed
     do
-      putStrLn $ show newNotiWithoutId
+      pPrint newNotiWithoutId
       -- TextIO.putStrLn $ Text.append "Body: " body
       -- TextIO.putStrLn $ Text.append "Parsed Body: " $ notiBody newNotiWithoutId
       -- Apply modifications and run scripts for noti

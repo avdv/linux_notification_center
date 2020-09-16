@@ -61,6 +61,7 @@ library
                      , hdaemonize
                      , directory
                      , process
+                     , pretty-simple
                      , tagsoup >= 0.14.7
                      , tuple
                      , split
