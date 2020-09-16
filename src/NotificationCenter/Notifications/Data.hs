@@ -18,10 +18,11 @@ import Foreign.Ptr (Ptr)
 import qualified Data.Map as Map ( Map )
 import Data.List ( sortOn )
 import DBus ( Variant (..), Signal )
+import Text.Show.Functions
 
 import GI.GdkPixbuf (Pixbuf(..), pixbufNewFromData, Colorspace(..))
 
-data Urgency = Normal | Low | High deriving Eq
+data Urgency = Normal | Low | High deriving (Eq, Show)
 data CloseType = Timeout | User | CloseByCall | Other deriving Eq
 
 instance Eq Notification where
@@ -50,28 +51,7 @@ data Notification = Notification
     --   timeout or by user
   , notiOnAction :: String -> IO ()
     -- ^ Should be called when an action is used
-  }
-
-instance Show Notification where
-  show n = foldl (++) ""
-    [ "Notification { \n"
-    , "  notiAppName = " ++ (show $ notiAppName n) ++ ", \n"
-    , "  notiRepId = " ++ (show $ notiRepId n) ++ ", \n" 
-    , "  notiId = " ++ (show $ notiId n) ++ ", \n" 
-    , "  notiIcon = " ++ (show $ notiIcon n) ++ ", \n" 
-    , "  notiImg = " ++ (show $ notiImg n) ++ ", \n" 
-    , "  notiSummary = " ++ (show $ notiSummary n) ++ ", \n" 
-    , "  notiBody = " ++ (show $ notiBody n) ++ ", \n" 
-    , "  notiActions = " ++ (show $ notiActions n) ++ ", \n" 
-    , "  notiActionIcons = " ++ (show $ notiActionIcons n) ++ ", \n" 
-    , "  notiHints = " ++ (show $ notiHints n) ++ ", \n" 
-    , "  notiTimeout = " ++ (show $ notiTimeout n) ++ ", \n" 
-    , "  notiTime = " ++ (show $ notiTime n) ++ ", \n" 
-    , "  notiTransient = " ++ (show $ notiTransient n) ++ ", \n" 
-    , "  notiSendClosedMsg = " ++ (show $ notiSendClosedMsg n) ++ "\n" 
-    , "  notiTop = " ++ (show $ notiTop n) ++ "\n"
-    , "  notiRight = " ++ (show $ notiRight n) ++ "\n"
-    , " } " ]
+  } deriving Show
 
 data Image = RawImg
   ( Int32 -- width
