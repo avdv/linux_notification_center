@@ -30,7 +30,6 @@ data Config = Config
   , configIgnoreTransient :: Bool
   , configMatchingRules :: [((Notification -> Bool), (Notification -> Notification), Maybe String)]
   , configNotiMarkup :: Bool
-  , configNotiParseHtmlEntities :: Bool
   , configSendNotiClosedDbusMessage :: Bool
   , configGuessIconFromAppname :: Bool
   , configNotiCenterMaxLinesInBody :: Int
@@ -110,7 +109,6 @@ getConfig p =
   , configIgnoreTransient = r'' False p nCenter "ignoreTransient"
   , configMatchingRules = zip3 match (modify ++ repeat id) $ run ++ repeat Nothing -- run
   , configNotiMarkup = r'' True p nCenter "useMarkup"
-  , configNotiParseHtmlEntities = r'' True p nCenter "parseHtmlEntities"
   , configSendNotiClosedDbusMessage = r'' False p nCenter "configSendNotiClosedDbusMessage"
   , configGuessIconFromAppname = r'' True p nCenter "guessIconFromAppname"
   , configNotiCenterMaxLinesInBody = r (-1) p nCenter "shortenBody"
