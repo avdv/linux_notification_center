@@ -7,7 +7,7 @@ module NotificationCenter.Notifications
   ) where
 
 import Helpers (trim, isPrefix, splitOn, atMay, eitherToMaybe
-               , removeImgTag, removeAllTags, parseHtmlEntities )
+               , removeImgTag, removeAllTags)
 
 import NotificationCenter.Notifications.NotificationPopup
   ( showNotificationWindow
@@ -191,11 +191,6 @@ getTime = do
   let format = pack . flip (formatTime zone) now
   return $ format "%H:%M"
 
-htmlEntitiesStrip :: Config -> Text -> Text
-htmlEntitiesStrip config text = 
-  if configNotiParseHtmlEntities config
-  then Text.pack $ parseHtmlEntities $ unpack text
-  else text
 
 xmlStrip :: Config -> Text -> Text
 xmlStrip config text = do
@@ -232,7 +227,7 @@ notify config tState emit
         , notiIcon = icon
         , notiImg = parseImg hints body
         , notiSummary = summary
-        , notiBody = htmlEntitiesStrip config $ xmlStrip config body
+        , notiBody = xmlStrip config body
         , notiActions = actions
         , notiActionIcons = parseActionIcons hints
         , notiHints = hints
