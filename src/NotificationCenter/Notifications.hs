@@ -6,8 +6,7 @@ module NotificationCenter.Notifications
   , hideAllNotis
   ) where
 
-import Helpers (trim, isPrefix, splitOn, atMay, eitherToMaybe
-               , removeImgTag, removeAllTags)
+import Helpers (trim, isPrefix, splitOn, atMay, eitherToMaybe)
 
 import NotificationCenter.Notifications.NotificationPopup
   ( showNotificationWindow
@@ -175,12 +174,11 @@ parseIcon config hints icon appName =
                     else
                       return NoImage
 
-parseImg :: Map.Map Text Variant -> Text -> Image
-parseImg hints text =
+parseImg :: Map.Map Text Variant -> Image
+parseImg hints =
   fromMaybe NoImage
-  $ fromBody <|> fromImageData <|> fromImagePath <|> fromIcon
+  $ fromImageData <|> fromImagePath <|> fromIcon
   where
-    fromBody = ImagePath <$> lookup "src" (snd $ removeImgTag (unpack text))
     fromIcon = RawImg <$> (fromVariant =<< Map.lookup "icon_data" hints)
     fromImageData = RawImg <$> (fromVariant =<< Map.lookup "image-data" hints)
     fromImagePath = parseImageString <$> (fromVariant =<< Map.lookup "image-path" hints)
@@ -190,13 +188,6 @@ getTime = do
   zone <- System.Locale.Read.getCurrentLocale
   let format = pack . flip (formatTime zone) now
   return $ format "%H:%M"
-
-
-xmlStrip :: Config -> Text -> Text
-xmlStrip config text = do
-  if configNotiMarkup config then
-    Text.pack $ fst $ removeImgTag $ unpack text
-    else Text.pack $ removeAllTags $ unpack text
 
 
 notify :: Config
@@ -216,7 +207,6 @@ notify config tState emit
   state <- readTVarIO tState
   time <- getTime
   icon <- parseIcon config hints icon appName
-  putStrLn $ show $ parseImg hints body
   let newNotiWithoutId = Notification
         { notiAppName = appName
         , notiRepId = replaceId
@@ -225,9 +215,9 @@ notify config tState emit
         -- done, instead it is handled lower done
         , notiId = 0
         , notiIcon = icon
-        , notiImg = parseImg hints body
+        , notiImg = parseImg hints
         , notiSummary = summary
-        , notiBody = xmlStrip config body
+        , notiBody = body
         , notiActions = actions
         , notiActionIcons = parseActionIcons hints
         , notiHints = hints

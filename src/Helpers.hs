@@ -5,8 +5,8 @@ import qualified Control.Monad.Error as Error
 import Control.Applicative ((<|>))
 import Data.Maybe (fromMaybe)
 import Data.Functor (fmap)
+--import Data.Sequence (drop)
 
-import Text.Regex.TDFA
 import qualified Data.Text as Text
 import Data.Char ( chr )
 import Text.I18N.GetText (textDomain, bindTextDomain, getText)
@@ -41,8 +41,6 @@ readConfigFile path = do
         return $ return CF.emptyCP)
   let c1 = fromEither CF.emptyCP c
   return c1
-
-fth (_, _, _, a) = a
 
 fromEither :: a -> Either b a -> a
 fromEither a e = case e of
@@ -112,39 +110,3 @@ atMay :: [a] -> Int -> Maybe a
 atMay ls i = if length ls > i then
   Just $ ls !! i else Nothing
 
-removeAllTags :: String -> String
-removeAllTags text =
-  let (a, _, c) =
-        (text =~ "<(/a|i|/i|u|/u|b|/b)>|<(a|img)( +[^>]*)*>"
-         :: (String, String, String))
-  in a ++ if length c > 0 then removeAllTags c else ""
-
-
-removeImgTag :: String -> (String, [(String, String)])
-removeImgTag text =
-  let (a, _, c, ms) =
-        (text =~ "<img([^>]*)/>"
-         :: (String, String, String, [String]))
-  in ((a ++ (if length ms > 0 then fst $ removeImgTag c else c))
-     , fromMaybe [] $ findTagProps <$> atMay ms 0)
-
--- | Parses HTML Entities in the given string and replaces them with
--- their representative characters. Only operates on entities in
--- the ASCII Range. See the following for details:
---
--- <https://www.freeformatter.com/html-entities.html>
-parseHtmlEntities :: String -> String
-parseHtmlEntities text = 
-  let (a, matched, c, ms) =
-        (text =~ "&#([0-9]{2,3});"
-         :: (String, String, String, [String]))
-      ascii = if length ms > 0 then (read $ head ms :: Int) else -1
-      repl = if 32 <= ascii && ascii <= 126 
-             then [chr ascii] else matched
-  in a ++ repl ++ (if length c > 0 then parseHtmlEntities c else "")
-
-findTagProps :: String -> [(String, String)]
-findTagProps match =
-  let (_, _, rest, keys) = (match =~ "([^ =]+)=\"([^\"]*)\""
-                             :: (String, String, String, [String]))
-  in if length keys > 0 then [(keys !! 0, keys !! 1)] ++ (findTagProps rest) else []
