@@ -3,7 +3,7 @@
 module Helpers where
 
 import qualified Data.ConfigFile as CF
-import qualified Control.Monad.Error as Error
+import qualified Control.Monad.Except as Error
 import Control.Applicative ((<|>))
 import Data.Maybe (fromMaybe)
 import Data.Functor (fmap)
@@ -34,7 +34,7 @@ translate = unsafePerformIO . getText
 
 readConfig :: CF.Get_C a => a -> CF.ConfigParser -> String -> String -> a
 readConfig defaultVal conf sec opt = fromEither defaultVal
-  $ fromEither (Right defaultVal) $ Error.runErrorT $ CF.get conf sec opt
+  $ fromEither (Right defaultVal) $ Error.runExceptT $ CF.get conf sec opt
 
 readConfigFile :: String -> IO CF.ConfigParser
 readConfigFile path = do
