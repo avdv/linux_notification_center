@@ -29,7 +29,7 @@ import DBus (Variant(..), Structure(..), fromVariant, signal, toVariant, variant
 import DBus.Internal.Message (Signal(..))
 import DBus.Client
        ( connectSession, AutoMethod(..), autoMethod, requestName, export
-       , nameAllowReplacement, nameReplaceExisting, emit)
+       , nameAllowReplacement, nameReplaceExisting, emit, interfaceName, interfaceMethods, defaultInterface )
 import Data.Char (toLower)
 import Data.Text (unpack, Text, pack )
 import qualified Data.Text as Text
@@ -362,16 +362,15 @@ notificationDaemon config onNote onCloseNote = do
   client <- connectSession
   _ <- requestName client "org.freedesktop.Notifications"
        [nameAllowReplacement, nameReplaceExisting]
-  export client "/org/freedesktop/Notifications"
-    [ autoMethod "org.freedesktop.Notifications"
-      "GetServerInformation" getServerInformation
-    , autoMethod "org.freedesktop.Notifications"
-      "GetCapabilities" (getCapabilities config)
-    , autoMethod "org.freedesktop.Notifications"
-      "CloseNotification" onCloseNote
-    , autoMethod "org.freedesktop.Notifications"
-      "Notify" (onNote (emit client))
-    ]
+  export client "/org/freedesktop/Notifications" defaultInterface
+    { interfaceName = "org.freedesktop.Notifications"
+    , interfaceMethods =
+      [ autoMethod "GetServerInformation" getServerInformation
+      , autoMethod "GetCapabilities" (getCapabilities config)
+      , autoMethod "CloseNotification" onCloseNote
+      , autoMethod "Notify" (onNote (emit client))
+      ]
+    }
 
 startNotificationDaemon :: Config -> IO () ->  IO () ->  IO (TVar NotifyState)
 startNotificationDaemon config onUpdate onUpdateForMe = do
